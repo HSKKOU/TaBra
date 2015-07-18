@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ThemeDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.UserDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Theme;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.User;
 
 public class ThemeListActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     private static final String TAG = ThemeListActivity.class.getSimpleName();
@@ -28,7 +30,7 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
     private UserDataController mUserDataCtrl;
     private ThemeDataController mThemeDataCtrl;
 
-    private String mUserName;
+    private String mUserName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +52,13 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
         if(user == null || user.isEmpty()){
             this.showRegisterUser();
         }else{
+            mUserName = user;
             this.setupThemeList();
         }
     }
 
     private void showRegisterUser() {
-        EditText edt = new EditText(ThemeListActivity.this);
+        final EditText edt = new EditText(ThemeListActivity.this);
         new AlertDialog.Builder(ThemeListActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("使用するユーザー名を入力してください")
@@ -63,18 +66,21 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setNegativeButton("キャンセル", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
+                        String userName = edt.getText().toString();
+                        registerUserName(userName);
                     }
                 }).show();
     }
 
+    private void registerUserName(String unStr){
+        User u = new User(unStr);
+        mUserDataCtrl.createUser(u);
+        mUserName = unStr;
+        setupThemeList();
+    }
+
     private void setupThemeList() {
+        Log.d(TAG, mUserName);
         List<ThemeListItem> themeLists = this.createThemeListItems();
         this.mThemeListView.setAdapter(new ThemeListAdapter(this, themeLists));
     }

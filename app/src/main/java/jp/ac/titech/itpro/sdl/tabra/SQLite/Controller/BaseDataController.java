@@ -4,6 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.Date;
+
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CREATED_AT;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_UPDATED_AT;
+
 /**
  * Created by hskk1120551 on 15/07/17.
  */
@@ -21,6 +26,9 @@ public class BaseDataController {
 
     protected long createModel(ContentValues _v){
         db = dbHelper.getWritableDatabase();
+        long now = (new Date()).getTime();
+        _v.put(KEY_CREATED_AT, now);
+        _v.put(KEY_UPDATED_AT, now);
         long id = db.insert(this.tableName, null, _v);
         db.close();
         return id;

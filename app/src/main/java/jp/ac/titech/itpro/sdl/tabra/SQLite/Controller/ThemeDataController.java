@@ -31,6 +31,7 @@ public class ThemeDataController extends BaseDataController {
     }
 
     public List<Theme> getAllThemes(){
+        db = dbHelper.getReadableDatabase();
         List<Theme> themeList = new ArrayList<Theme>();
 
         Cursor c = db.query(this.tableName, null, null, null, null, null, null);
@@ -42,6 +43,7 @@ public class ThemeDataController extends BaseDataController {
             } while (c.moveToNext());
         }
 
+        db.close();
         return themeList;
     }
 
@@ -51,6 +53,7 @@ public class ThemeDataController extends BaseDataController {
         for(Theme t : themeList){
             titles.add(t.getTitle());
         }
+
         return titles;
     }
 }

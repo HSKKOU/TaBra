@@ -6,9 +6,9 @@ import android.database.Cursor;
 
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.User;
 
-import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.TABLE_USERS;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.USER_COLUMS;
 
 
 /**
@@ -28,12 +28,14 @@ public class UserDataController extends BaseDataController {
     }
 
     public String getExistUser(){
-        db = this.dbHelper.getReadableDatabase();
-        Cursor c = db.query(this.tableName, null, null, null, null, null, null, "1");
+        db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(this.tableName, USER_COLUMS, null, null, null, null, null, null);
+        String ret = "";
         if(c.moveToFirst()){
-            return c.getString(c.getColumnIndex(KEY_NAME));
-        }else{
-            return null;
+            ret = c.getString(c.getColumnIndex(KEY_USER_NAME));
         }
+
+        db.close();
+        return ret;
     }
 }
