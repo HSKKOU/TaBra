@@ -6,26 +6,36 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ThemeDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.UserDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Theme;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.User;
 
+import static jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity.PARAM_THEME_ID;
+import static jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity.PARAM_USER_NAME;
+
 public class ThemeListActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     private static final String TAG = ThemeListActivity.class.getSimpleName();
 
     private ListView mThemeListView;
+    private ArrayAdapter<ThemeListItem> mListAdapter;
 
     private UserDataController mUserDataCtrl;
     private ThemeDataController mThemeDataCtrl;
@@ -83,7 +93,44 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
         Log.d(TAG, mUserName);
         this.setTitle(mUserName + "さんのアクティビティ");
         List<ThemeListItem> themeLists = this.createThemeListItems();
-        this.mThemeListView.setAdapter(new ThemeListAdapter(this, themeLists));
+        mListAdapter = new ThemeListAdapter(this, themeLists);
+        this.mThemeListView.setAdapter(mListAdapter);
+    }
+
+    private void showCreateTheme(){
+        final PopupWindow pw = new PopupWindow(ThemeListActivity.this);
+        final View popupView = getLayoutInflater().inflate(R.layout.popup_create_theme, null);
+        popupView.findViewById(R.id.theme_create_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pw.isShowing()) {
+                    createTheme(popupView);
+                    pw.dismiss();
+                }
+            }
+        });
+
+        pw.setContentView(popupView);
+        pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_background));
+
+        pw.setOutsideTouchable(true);
+        pw.setFocusable(true);
+
+        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
+        pw.setWindowLayoutMode((int) width, WindowManager.LayoutParams.WRAP_CONTENT);
+        pw.setWidth((int) width);
+        pw.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+
+        pw.showAtLocation(findViewById(R.id.theme_listview), Gravity.CENTER, 0, 0);
+    }
+
+    private void createTheme(View v){
+        String title = ((EditText)v.findViewById(R.id.theme_create_input_title)).getText().toString();
+        String overview = ((EditText)v.findViewById(R.id.theme_create_input_overview)).getText().toString();
+        Theme t = new Theme(title, overview);
+        mThemeDataCtrl.createTheme(t);
+
+        setupThemeList();
     }
 
     private List<ThemeListItem> createThemeListItems(){
@@ -103,7 +150,18 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ListView listView = (ListView) parent;
 
-        Intent intent = new Intent();
+        Log.d(TAG, "position: " + position);
+        if(position == 0){
+            showCreateTheme();
+            return;
+        }
+
+        ThemeListItem t = mListAdapter.getItem(position);
+
+        Intent intent = new Intent(this, BrainStormMainActivity.class);
+        intent.putExtra(PARAM_THEME_ID, t.getId());
+        intent.putExtra(PARAM_USER_NAME, mUserName);
+        startActivity(intent);
     }
 
     @Override
