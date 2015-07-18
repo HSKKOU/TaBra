@@ -81,6 +81,7 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
 
     private void setupThemeList() {
         Log.d(TAG, mUserName);
+        this.setTitle(mUserName + "さんのアクティビティ");
         List<ThemeListItem> themeLists = this.createThemeListItems();
         this.mThemeListView.setAdapter(new ThemeListAdapter(this, themeLists));
     }
