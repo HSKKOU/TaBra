@@ -18,7 +18,7 @@ public class BrainStormMainActivity extends Activity {
     public static final String PARAM_USER_NAME = "USER_NAME";
 
     private String mUserName = "";
-    private int mThemeId;
+    private long mThemeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class BrainStormMainActivity extends Activity {
         setContentView(R.layout.activity_brain_storm_main);
 
         Intent intent = getIntent();
-        mThemeId = intent.getIntExtra(PARAM_THEME_ID, -1);
+        mThemeId = intent.getLongExtra(PARAM_THEME_ID, -1);
         mUserName = intent.getStringExtra(PARAM_USER_NAME);
 
         Log.d(TAG, "id: " + mThemeId + "userName: " + mUserName);
