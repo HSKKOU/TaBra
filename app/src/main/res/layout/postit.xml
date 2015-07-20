@@ -4,11 +4,10 @@
     android:layout_width="120dp"
     android:layout_height="150dp"
     android:background="#ffc0cb"
-    android:layout_x="500dp"
-    android:layout_y="500dp"
     >
 
     <TextView
+        android:id="@+id/postit_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp"

@@ -13,14 +13,18 @@ public class Item extends BaseModel {
     private String name;
     private String content;
     private String userName;
+    private int pos_x;
+    private int pos_y;
 
     public Item(){}
 
-    public Item(String name, String content, String username){
+    public Item(String name, String content, String username, int pos_x, int pos_y){
         super();
         this.name = name;
         this.content = content;
         this.userName = username;
+        this.pos_x = pos_x;
+        this.pos_y = pos_y;
     }
 
     // name
@@ -34,6 +38,11 @@ public class Item extends BaseModel {
     // username
     public String getUserName(){return this.userName;}
     public void setUserName(String username){this.userName = username;}
+
+    public int getPos_x(){return this.pos_x;}
+    public void setPos_x(int pos_x){this.pos_x = pos_x;}
+    public int getPos_y(){return this.pos_y;}
+    public void setPos_y(int pos_y){this.pos_y = pos_y;}
 
     // set All Culomns
     public void setAllColumns(Cursor c){

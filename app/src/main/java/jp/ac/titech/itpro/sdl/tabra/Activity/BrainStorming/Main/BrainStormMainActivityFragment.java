@@ -1,4 +1,4 @@
-package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming;
+package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 
 import android.app.Fragment;
 import android.graphics.Point;
@@ -26,6 +26,8 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     private AbsoluteLayout mWhiteBoard;
     private Button mCreatePostitButton;
 
+    private PostitController mPostitCtrl;
+
     private float mDownX;
     private float mDownY;
 
@@ -49,6 +51,15 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
         mWhiteBoard = (AbsoluteLayout)v.findViewById(R.id.brainstorm_main_whiteboard);
         mCreatePostitButton = (Button)v.findViewById(R.id.brainstorm_main_create_postit_button);
 
+        mPostitCtrl = new PostitController(getActivity(), mWhiteBoard);
+
+        mCreatePostitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pushCreateButton(v);
+            }
+        });
+
         WindowManager wm = getActivity().getWindowManager();
         Display display = wm.getDefaultDisplay();
 
@@ -59,11 +70,16 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
 
         int l = (mScrollW - mWhiteBoardW) / 2;
         int t = (mScrollH - mWhiteBoardH) / 2;
+        mPostitCtrl.setCenter(mScrollW/2, mScrollH/2);
         mWhiteBoard.layout(l, t, l + mWhiteBoardW, t + mWhiteBoardH);
 
         mWhiteBoard.setOnTouchListener(this);
 
         return v;
+    }
+
+    private void pushCreateButton(View v) {
+        mPostitCtrl.createPostit();
     }
 
     @Override
@@ -85,27 +101,14 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
             int r = l + w;
             int b = t + h;
 
-            if(l > kMargin){
-                l = kMargin;
-                r = l + w;
-            }
+            if(l > kMargin){l = kMargin;}
+            if(t > kMargin){t = kMargin;}
+            if(r < mScrollW - kMargin){l = mScrollW - kMargin - w;}
+            if(b < mScrollH - kMargin){t = mScrollH - kMargin - h;}
 
-            if(t > kMargin){
-                t = kMargin;
-                b = t + h;
-            }
-
-            if(r < mScrollW - kMargin){
-                r = mScrollW - kMargin;
-                l = r - w;
-            }
-
-            if(b < mScrollH - kMargin){
-                b = mScrollH - kMargin;
-                t = b - h;
-            }
-
-            v.layout(l, t, r, b);
+            v.setX(l);
+            v.setY(t);
+            mPostitCtrl.setCenter(mScrollW/2 - l - kMargin, mScrollH/2 - t - kMargin);
 
             return false;
         }
