@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="postit_red">#ffc0cb</color>
+    <color name="postit_yellow">#f0e68c</color>
+    <color name="postit_blue">#add8e6</color>
+    <color name="postit_green">#98fb98</color>
+    <color name="postit_white">#f0f8ff</color>
+</resources>

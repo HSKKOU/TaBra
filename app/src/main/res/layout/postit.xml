@@ -4,7 +4,6 @@
     android:layout_width="120dp"
     android:layout_height="150dp"
     android:orientation="vertical"
-    android:background="#ffc0cb"
     >
 
     <TextView
@@ -14,7 +13,6 @@
         android:padding="10dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:text="コメントコメントコメントコメントコメントコメントコメントコメント"
         />
 
     <TextView
