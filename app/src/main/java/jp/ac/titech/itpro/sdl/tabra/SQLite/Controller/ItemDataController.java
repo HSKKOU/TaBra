@@ -2,11 +2,16 @@ package jp.ac.titech.itpro.sdl.tabra.SQLite.Controller;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
-import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_NAME;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.TABLE_ITEMS;
 
@@ -22,9 +27,27 @@ public class ItemDataController extends BaseDataController {
 
     public long createItem(Item item){
         ContentValues v = new ContentValues();
-        v.put(KEY_NAME, item.getName());
+        v.put(KEY_THEME_ID, item.getTheme_id());
         v.put(KEY_CONTENT, item.getContent());
-        v.put(KEY_USER_NAME, item.getName());
+        v.put(KEY_USER_NAME, item.getUserName());
+        v.put(KEY_COLOR, item.getColor());
         return super.createModel(v);
+    }
+
+    public List<Item> getAllItems(){
+        db = dbHelper.getReadableDatabase();
+        List<Item> itemList = new ArrayList<Item>();
+
+        Cursor c = db.query(this.tableName, null, null, null, null, null, null);
+        if (c.moveToFirst()) {
+            do {
+                Item i = new Item();
+                i.setAllColumns(c);
+                itemList.add(i);
+            } while (c.moveToNext());
+        }
+
+        db.close();
+        return itemList;
     }
 }
