@@ -30,8 +30,16 @@ public class PostitController {
     public void createPostit(Item item) {
         View postitview = mFactory.createPostitView();
 
-        TextView nameText = (TextView)postitview.findViewById(R.id.postit_hidden_id);
-        nameText.setText(item.getId() + "");
+        TextView idText = (TextView)postitview.findViewById(R.id.postit_hidden_id);
+        idText.setText(item.getId() + "");
+
+        TextView contentText = (TextView)postitview.findViewById(R.id.postit_text);
+        contentText.setText(item.getContent() + "");
+
+        postitview.setBackgroundColor(colorStr2Int(mContext, item.getColor()));
+
+        postitview.setX(item.getPos_x());
+        postitview.setY(item.getPos_y());
 
         mParentView.addView(postitview);
     }
@@ -43,5 +51,13 @@ public class PostitController {
     public void setCenter(int x, int y) {
         this.center.x = x;
         this.center.y = y;
+    }
+
+    public static int colorStr2Int(Context context, String colorStr) {
+        if("postit_red".equals(colorStr)){return context.getResources().getColor(R.color.postit_red);}
+        else if("postit_yellow".equals(colorStr)){return context.getResources().getColor(R.color.postit_yellow);}
+        else if("postit_blue".equals(colorStr)){return context.getResources().getColor(R.color.postit_blue);}
+        else if("postit_green".equals(colorStr)){return context.getResources().getColor(R.color.postit_green);}
+        else{return context.getResources().getColor(R.color.postit_white);}
     }
 }
