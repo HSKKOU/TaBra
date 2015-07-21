@@ -3,6 +3,7 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 import android.app.Fragment;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,9 +14,13 @@ import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import java.util.List;
+
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit.BrainStormPostitCreateFragment;
 import jp.ac.titech.itpro.sdl.tabra.R;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -37,6 +42,8 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     private int mWhiteBoardH = 4000;
 
     private static final int kMargin = 30;
+
+    private ItemDataController mItemCtrl;
 
     public static BrainStormMainActivityFragment newInstance() {
         BrainStormMainActivityFragment fragment = new BrainStormMainActivityFragment();
@@ -64,6 +71,8 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
             }
         });
 
+        mItemCtrl = new ItemDataController(getActivity());
+
         this.initializeWhiteboard();
 
         this.setPostits();
@@ -89,12 +98,22 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     }
 
     private void setPostits() {
-
+        List<Item> itemList = mItemCtrl.getAllItems();
+        for(Item item: itemList){
+            Log.d(TAG, "------------------");
+            Log.d(TAG, item.getId() + "");
+            Log.d(TAG, item.getTheme_id() + "");
+            Log.d(TAG, item.getContent());
+            Log.d(TAG, item.getUserName());
+            Log.d(TAG, item.getColor());
+            Log.d(TAG, item.getPos_x() + "," + item.getPos_y());
+            mPostitCtrl.createPostit(item);
+        }
+        Log.d(TAG, "------------------");
     }
 
     private void pushCreateButton(View v) {
         ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance());
-//        mPostitCtrl.createPostit(new Item());
     }
 
     private float mDownX;
