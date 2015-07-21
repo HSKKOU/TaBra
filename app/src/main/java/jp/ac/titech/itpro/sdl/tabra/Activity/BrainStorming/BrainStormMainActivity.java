@@ -20,8 +20,8 @@ public class BrainStormMainActivity extends Activity implements BrainStormPostit
     public static final String PARAM_THEME_ID = "THEME_ID";
     public static final String PARAM_USER_NAME = "USER_NAME";
 
-    private String mUserName = "";
     private long mThemeId;
+    private String mUserName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,9 @@ public class BrainStormMainActivity extends Activity implements BrainStormPostit
     public void clearAllFragments(){
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
+
+    public long getmThemeId(){return this.mThemeId;}
+    public String getmUserName(){return this.mUserName;}
 
     @Override
     public void onFragmentInteraction(Uri uri) {
