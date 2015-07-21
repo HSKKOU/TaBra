@@ -4,6 +4,8 @@ import android.database.Cursor;
 
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_X;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_Y;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 
@@ -57,5 +59,7 @@ public class Item extends BaseModel {
         this.content = c.getString(c.getColumnIndex(KEY_CONTENT));
         this.userName = c.getString(c.getColumnIndex(KEY_USER_NAME));
         this.color = c.getString(c.getColumnIndex(KEY_COLOR));
+        this.pos_x = c.getInt(c.getColumnIndex(KEY_POS_X));
+        this.pos_y = c.getInt(c.getColumnIndex(KEY_POS_Y));
     }
 }
