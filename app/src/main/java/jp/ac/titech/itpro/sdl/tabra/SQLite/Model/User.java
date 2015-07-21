@@ -2,7 +2,7 @@ package jp.ac.titech.itpro.sdl.tabra.SQLite.Model;
 
 import android.database.Cursor;
 
-import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_NAME;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 
 /**
  * Created by hskk1120551 on 15/07/17.
@@ -26,6 +26,6 @@ public class User extends BaseModel {
     // set All Culomns
     public void setAllColumns(Cursor c){
         super.setCommonCulomns(c);
-        this.name = c.getString(c.getColumnIndex(KEY_NAME));
+        this.name = c.getString(c.getColumnIndex(KEY_USER_NAME));
     }
 }
