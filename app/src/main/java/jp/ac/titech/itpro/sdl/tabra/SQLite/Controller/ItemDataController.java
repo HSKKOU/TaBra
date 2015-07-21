@@ -11,6 +11,8 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_X;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_Y;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.TABLE_ITEMS;
@@ -31,6 +33,8 @@ public class ItemDataController extends BaseDataController {
         v.put(KEY_CONTENT, item.getContent());
         v.put(KEY_USER_NAME, item.getUserName());
         v.put(KEY_COLOR, item.getColor());
+        v.put(KEY_POS_X, item.getPos_x());
+        v.put(KEY_POS_Y, item.getPos_y());
         return super.createModel(v);
     }
 
