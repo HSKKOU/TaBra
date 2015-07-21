@@ -1,9 +1,11 @@
 package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +23,7 @@ import jp.ac.titech.itpro.sdl.tabra.R;
  * create an instance of this fragment.
  */
 public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener {
+    private static final String TAG = BrainStormPostitCreateFragment.class.getSimpleName();
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,37 +54,63 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     }
 
 
-    private float lastTouchY;
-    private float currentY;
+    private float mDownY;
+    private int defY;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                lastTouchY = event.getY();
-                break;
+                defY = (int)v.getY();
+                mDownY = event.getY();
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                float moveY = event.getY() - mDownY;
+                int currentY = (int)(moveY + v.getY());
+
+                if (v.getY() <= defY) {
+                    v.setY(currentY);
+                }
+
+                return false;
             case MotionEvent.ACTION_UP:
-                currentY = event.getY() - lastTouchY;
-                if (lastTouchY < currentY) {
-
+                if (v.getY() > defY) {
+                    return false;
                 }
-                if (lastTouchY > currentY) {
 
+                if (v.getY() < defY - v.getHeight() / 4) {
+                    this.animateTransitionPostitView(v, v.getHeight()*(-1));
+                } else {
+                    this.animateTransitionPostitView(v, defY);
                 }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                currentY = event.getY();
-                if (lastTouchY < currentY) {
 
-                }
-                if (lastTouchY > currentY) {
-
-                }
-                break;
+                return false;
         }
-        return true;
+        return false;
     }
 
-    private void updatePosition(View v, int dy) {
+    private void animateTransitionPostitView(View target, int dest) {
+        ObjectAnimator oa = ObjectAnimator.ofFloat(target, "y", target.getY(), dest);
+        oa.setDuration(500);
+        oa.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                
+            }
+        });
+        oa.start();
     }
 
     public void onButtonPressed(Uri uri) {
