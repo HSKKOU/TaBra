@@ -34,12 +34,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String[] THEME_COLUMS = {KEY_ID, KEY_TITLE, KEY_OVERVIEW, KEY_CREATED_AT, KEY_UPDATED_AT};
 
     // ITEM TABLE - column names
-    public static final String KEY_NAME = "name";
+    public static final String KEY_THEME_ID = "theme_id";
     public static final String KEY_CONTENT = "content";
     public static final String KEY_COLOR = "color";
     public static final String KEY_POS_X = "position_x";
     public static final String KEY_POS_Y = "position_y";
-    public static final String[] ITEM_COLUMS = {KEY_ID, KEY_NAME, KEY_CONTENT, KEY_USER_NAME, KEY_COLOR, KEY_POS_X, KEY_POS_Y, KEY_CREATED_AT, KEY_UPDATED_AT};
+    public static final String[] ITEM_COLUMS = {KEY_ID, KEY_THEME_ID, KEY_CONTENT, KEY_USER_NAME, KEY_COLOR, KEY_POS_X, KEY_POS_Y, KEY_CREATED_AT, KEY_UPDATED_AT};
 
     // Statements
     // USER TABLE create statement
@@ -47,8 +47,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             = "CREATE TABLE " + TABLE_USERS + "("
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
             + KEY_USER_NAME + " TEXT NOT NULL,"
-            + KEY_CREATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now'),"
-            + KEY_UPDATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now')"
+            + KEY_CREATED_AT + " INTEGER NOT NULL,"
+            + KEY_UPDATED_AT + " INTEGER NOT NULL"
             + ")";
 
     // THEME TABLE create statement
@@ -57,22 +57,22 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
             + KEY_TITLE + " TEXT NOT NULL,"
             + KEY_OVERVIEW + " TEXT,"
-            + KEY_CREATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now'),"
-            + KEY_UPDATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now')"
+            + KEY_CREATED_AT + " INTEGER NOT NULL,"
+            + KEY_UPDATED_AT + " INTEGER NOT NULL"
             + ")";
 
     // ITEM TABLE create statement
     private static final String CREATE_TABLE_ITEM
             = "CREATE TABLE " + TABLE_ITEMS + "("
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-            + KEY_NAME + " TEXT NOT NULL,"
+            + KEY_THEME_ID + " INTEGER NOT NULL,"
             + KEY_CONTENT + " TEXT,"
             + KEY_USER_NAME + " TEXT NOT NULL,"
             + KEY_COLOR + " TEXT NOT NULL,"
             + KEY_POS_X + " INTEGER NOT NULL DEFAULT 0,"
             + KEY_POS_Y + " INTEGER NOT NULL DEFAULT 0,"
-            + KEY_CREATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now'),"
-            + KEY_UPDATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now')"
+            + KEY_CREATED_AT + " INTEGER NOT NULL,"
+            + KEY_UPDATED_AT + " INTEGER NOT NULL"
             + ")";
 
 
