@@ -16,8 +16,8 @@
 
         <AbsoluteLayout
             android:id="@+id/brainstorm_main_whiteboard"
-            android:layout_width="2000dp"
-            android:layout_height="2000dp"
+            android:layout_width="1500dp"
+            android:layout_height="1000dp"
             android:background="@drawable/frame01"
             >
 
