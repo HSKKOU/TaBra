@@ -38,10 +38,10 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     private int mScrollW;
     private int mScrollH;
 
-    private int mWhiteBoardW = 4000;
-    private int mWhiteBoardH = 4000;
+    private int mWhiteBoardW = 1500;
+    private int mWhiteBoardH = 1000;
 
-    private static final int kMargin = 30;
+    private static final int kMargin = 50;
 
     private ItemDataController mItemCtrl;
 
@@ -113,7 +113,7 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     }
 
     private void pushCreateButton(View v) {
-        ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance());
+        ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance(this.mPostitCtrl.getCenter()));
     }
 
     private float mDownX;

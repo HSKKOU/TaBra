@@ -4,8 +4,12 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.PostitController;
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
@@ -29,6 +34,8 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
  */
 public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener {
     private static final String TAG = BrainStormPostitCreateFragment.class.getSimpleName();
+    private static final String CENTERX = "centerX";
+    private static final String CENTERY = "centerY";
 
     private OnFragmentInteractionListener mListener;
 
@@ -39,10 +46,16 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     private TextView mUsernameTextView;
     private TextView mCreatedAtTextView;
 
-    private String mPostitColor = "ffc0cb";
+    private String mPostitColor = "postit_red";
 
-    public static BrainStormPostitCreateFragment newInstance() {
+    private Point mMainFragmentCenter;
+
+    public static BrainStormPostitCreateFragment newInstance(Point center) {
         BrainStormPostitCreateFragment fragment = new BrainStormPostitCreateFragment();
+        Bundle args = new Bundle();
+        args.putInt(CENTERX, center.x);
+        args.putInt(CENTERY, center.y);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -52,6 +65,11 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            int cx = getArguments().getInt(CENTERX);
+            int cy = getArguments().getInt(CENTERY);
+            this.mMainFragmentCenter = new Point(cx, cy);
+        }
     }
 
     @Override
@@ -60,13 +78,50 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_brain_storm_postit_create, container, false);
 
-        LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
+        final LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
         postitView.setOnTouchListener(this);
 
         mContentEditView = (EditText)v.findViewById(R.id.postit_create_edit);
         mContentTextView = (TextView)v.findViewById(R.id.postit_create_content);
         mUsernameTextView = (TextView)v.findViewById(R.id.postit_create_username);
         mCreatedAtTextView = (TextView)v.findViewById(R.id.postit_create_created_at);
+
+        v.findViewById(R.id.postit_color_red).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {changePostitColor("postit_red", postitView);}
+        });
+        v.findViewById(R.id.postit_color_yellow).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {changePostitColor("postit_yellow", postitView);}
+        });
+        v.findViewById(R.id.postit_color_blue).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {changePostitColor("postit_blue", postitView);}
+        });
+        v.findViewById(R.id.postit_color_green).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {changePostitColor("postit_green", postitView);}
+        });
+        v.findViewById(R.id.postit_color_white).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {changePostitColor("postit_white", postitView);}
+        });
+
+        mContentEditView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mContentTextView.setText(s);
+            }
+        });
 
         String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
         mUsernameTextView.setText(userName);
@@ -76,6 +131,11 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         return v;
     }
 
+    private void changePostitColor(String color, View v){
+        mPostitColor = color;
+        int colorHex = PostitController.colorStr2Int(getActivity(), color);
+        v.setBackgroundColor(colorHex);
+    }
 
     private float mDownY;
     private int defY;
@@ -111,7 +171,7 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         return false;
     }
 
-    private void animateTransitionPostitView(final View target, int dest) {
+    private void animateTransitionPostitView(final View target, final int dest) {
         ObjectAnimator oa = ObjectAnimator.ofFloat(target, "y", target.getY(), dest);
         oa.setDuration(500);
         oa.addListener(new Animator.AnimatorListener() {
@@ -130,14 +190,16 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if(dest == defY){return;}
                 BrainStormMainActivity activity = (BrainStormMainActivity)getActivity();
+                Log.d(TAG, mMainFragmentCenter.x + "," + mMainFragmentCenter.y);
                 Item item = new Item(
                         activity.getmThemeId(),
                         mContentTextView.getText().toString(),
                         activity.getmUserName(),
                         mPostitColor,
-                        (int)target.getX(),
-                        (int)target.getY()
+                        mMainFragmentCenter.x,
+                        mMainFragmentCenter.y
                 );
                 mItemCtrl.createItem(item);
                 ((BrainStormMainActivity)getActivity()).popFragment();
