@@ -3,7 +3,6 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import jp.ac.titech.itpro.sdl.tabra.R;
@@ -27,8 +26,8 @@ public class PostitFactory {
         mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public View createPostitView() {
-        View postit = mInflater.inflate(R.layout.postit, null);
+    public PostitView createPostitView() {
+        PostitView postit = (PostitView)mInflater.inflate(R.layout.postit, null);
         Point center = mPostitCtrl.getCenter();
         postit.setX(center.x - mPostitH/2);
         postit.setY(center.y - mPostitH / 2);

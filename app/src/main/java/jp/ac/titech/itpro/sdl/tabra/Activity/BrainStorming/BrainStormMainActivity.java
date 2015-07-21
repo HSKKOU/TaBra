@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit.BrainStormPostitCreateFragment;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.BrainStormMainActivityFragment;
 import jp.ac.titech.itpro.sdl.tabra.R;
 
-public class BrainStormMainActivity extends Activity {
+public class BrainStormMainActivity extends Activity implements BrainStormPostitCreateFragment.OnFragmentInteractionListener {
     private static final String TAG = BrainStormMainActivity.class.getSimpleName();
 
     public static final String PARAM_THEME_ID = "THEME_ID";
@@ -30,6 +33,8 @@ public class BrainStormMainActivity extends Activity {
         mUserName = intent.getStringExtra(PARAM_USER_NAME);
 
         Log.d(TAG, "id: " + mThemeId + "userName: " + mUserName);
+
+        replaceFragment(BrainStormMainActivityFragment.newInstance());
     }
 
     public void replaceFragment(Fragment f){
@@ -43,6 +48,11 @@ public class BrainStormMainActivity extends Activity {
     }
     public void clearAllFragments(){
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
     @Override

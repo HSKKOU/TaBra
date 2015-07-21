@@ -9,15 +9,6 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <fragment
-            android:id="@+id/fragment"
-            android:name="jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.BrainStormMainActivityFragment"
-            tools:layout="@layout/fragment_brain_storm_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

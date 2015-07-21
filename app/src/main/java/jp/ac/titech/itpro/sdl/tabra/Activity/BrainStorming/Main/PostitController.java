@@ -2,8 +2,9 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.view.View;
 import android.widget.AbsoluteLayout;
+
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 /**
  * Created by hskk1120551 on 15/07/20.
@@ -23,8 +24,11 @@ public class PostitController {
         this.mFactory = new PostitFactory(mContext, this);
     }
 
-    public void createPostit() {
-        View postitview = mFactory.createPostitView();
+    public void createPostit(Item item) {
+        PostitView postitview = mFactory.createPostitView();
+
+        postitview.setItem(item);
+
         mParentView.addView(postitview);
     }
 

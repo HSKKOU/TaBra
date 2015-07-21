@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import jp.ac.titech.itpro.sdl.tabra.R;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -28,9 +29,6 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
 
     private PostitController mPostitCtrl;
 
-    private float mDownX;
-    private float mDownY;
-
     private int mScrollW;
     private int mScrollH;
 
@@ -38,6 +36,11 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     private int mWhiteBoardH = 4000;
 
     private static final int kMargin = 30;
+
+    public static BrainStormMainActivityFragment newInstance() {
+        BrainStormMainActivityFragment fragment = new BrainStormMainActivityFragment();
+        return fragment;
+    }
 
     public BrainStormMainActivityFragment() {
     }
@@ -60,6 +63,14 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
             }
         });
 
+        this.initializeWhiteboard();
+
+        this.setPostits();
+
+        return v;
+    }
+
+    private void initializeWhiteboard() {
         WindowManager wm = getActivity().getWindowManager();
         Display display = wm.getDefaultDisplay();
 
@@ -74,14 +85,19 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
         mWhiteBoard.layout(l, t, l + mWhiteBoardW, t + mWhiteBoardH);
 
         mWhiteBoard.setOnTouchListener(this);
+    }
 
-        return v;
+    private void setPostits() {
+
     }
 
     private void pushCreateButton(View v) {
-        mPostitCtrl.createPostit();
+//        ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance());
+        mPostitCtrl.createPostit(new Item());
     }
 
+    private float mDownX;
+    private float mDownY;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
@@ -115,4 +131,5 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
 
         return false;
     }
+
 }
