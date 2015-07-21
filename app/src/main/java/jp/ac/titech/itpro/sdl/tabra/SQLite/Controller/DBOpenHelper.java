@@ -36,9 +36,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     // ITEM TABLE - column names
     public static final String KEY_NAME = "name";
     public static final String KEY_CONTENT = "content";
+    public static final String KEY_COLOR = "color";
     public static final String KEY_POS_X = "position_x";
     public static final String KEY_POS_Y = "position_y";
-    public static final String[] ITEM_COLUMS = {KEY_ID, KEY_NAME, KEY_CONTENT, KEY_POS_X, KEY_POS_Y, KEY_USER_NAME, KEY_CREATED_AT, KEY_UPDATED_AT};
+    public static final String[] ITEM_COLUMS = {KEY_ID, KEY_NAME, KEY_CONTENT, KEY_USER_NAME, KEY_COLOR, KEY_POS_X, KEY_POS_Y, KEY_CREATED_AT, KEY_UPDATED_AT};
 
     // Statements
     // USER TABLE create statement
@@ -67,6 +68,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             + KEY_NAME + " TEXT NOT NULL,"
             + KEY_CONTENT + " TEXT,"
             + KEY_USER_NAME + " TEXT NOT NULL,"
+            + KEY_COLOR + " TEXT NOT NULL,"
             + KEY_POS_X + " INTEGER NOT NULL DEFAULT 0,"
             + KEY_POS_Y + " INTEGER NOT NULL DEFAULT 0,"
             + KEY_CREATED_AT + " INTEGER NOT NULL DEFAULT DATETIME('now'),"

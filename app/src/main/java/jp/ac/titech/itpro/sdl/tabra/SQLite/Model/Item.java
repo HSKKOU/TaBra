@@ -2,6 +2,7 @@ package jp.ac.titech.itpro.sdl.tabra.SQLite.Model;
 
 import android.database.Cursor;
 
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
@@ -13,16 +14,18 @@ public class Item extends BaseModel {
     private String name;
     private String content;
     private String userName;
+    private String color;
     private int pos_x;
     private int pos_y;
 
     public Item(){}
 
-    public Item(String name, String content, String username, int pos_x, int pos_y){
+    public Item(String name, String content, String username, String color, int pos_x, int pos_y){
         super();
         this.name = name;
         this.content = content;
         this.userName = username;
+        this.color = color;
         this.pos_x = pos_x;
         this.pos_y = pos_y;
     }
@@ -39,6 +42,9 @@ public class Item extends BaseModel {
     public String getUserName(){return this.userName;}
     public void setUserName(String username){this.userName = username;}
 
+    public String getColor(){return this.color;}
+    public void setColor(String color){this.color = color;}
+
     public int getPos_x(){return this.pos_x;}
     public void setPos_x(int pos_x){this.pos_x = pos_x;}
     public int getPos_y(){return this.pos_y;}
@@ -50,5 +56,6 @@ public class Item extends BaseModel {
         this.name = c.getString(c.getColumnIndex(KEY_NAME));
         this.content = c.getString(c.getColumnIndex(KEY_CONTENT));
         this.userName = c.getString(c.getColumnIndex(KEY_USER_NAME));
+        this.color = c.getString(c.getColumnIndex(KEY_COLOR));
     }
 }
