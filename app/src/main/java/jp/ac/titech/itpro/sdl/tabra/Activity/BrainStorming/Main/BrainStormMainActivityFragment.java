@@ -13,8 +13,9 @@ import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit.BrainStormPostitCreateFragment;
 import jp.ac.titech.itpro.sdl.tabra.R;
-import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -92,8 +93,8 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
     }
 
     private void pushCreateButton(View v) {
-//        ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance());
-        mPostitCtrl.createPostit(new Item());
+        ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance());
+//        mPostitCtrl.createPostit(new Item());
     }
 
     private float mDownX;

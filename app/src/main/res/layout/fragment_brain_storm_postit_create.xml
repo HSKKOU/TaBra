@@ -33,18 +33,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:padding="20dp"
-                    android:textAlignment="center"
+                    android:padding="50dp"
+                    android:textSize="24pt"
+                    android:gravity="center_vertical|center_horizontal"
                     android:text="コメントコメントコメントコメントコメントコメントコメントコメント"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:padding="20dp"
-                    android:textAlignment="center"
-                    android:text="作成者作成者作成者作成者作成者"
+                    android:layout_height="60dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="20dp"
+                    android:textSize="14pt"
+                    android:gravity="right|center_vertical"
+                    android:text="作成者"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:textSize="10pt"
+                    android:paddingRight="20dp"
+                    android:gravity="right|center_vertical"
+                    android:text="2015/07/01 12:56"
                     />
 
             </LinearLayout>
@@ -82,6 +94,24 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:background="#add8e6"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <View
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="#98fb98"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                />
+
+            <View
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="#f0f8ff"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
