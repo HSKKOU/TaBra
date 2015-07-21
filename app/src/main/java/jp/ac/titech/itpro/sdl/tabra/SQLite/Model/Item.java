@@ -4,14 +4,14 @@ import android.database.Cursor;
 
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
-import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_NAME;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 
 /**
  * Created by hskk1120551 on 15/07/17.
  */
 public class Item extends BaseModel {
-    private String name;
+    private long theme_id;
     private String content;
     private String userName;
     private String color;
@@ -20,9 +20,9 @@ public class Item extends BaseModel {
 
     public Item(){}
 
-    public Item(String name, String content, String username, String color, int pos_x, int pos_y){
+    public Item(long theme_id, String content, String username, String color, int pos_x, int pos_y){
         super();
-        this.name = name;
+        this.theme_id = theme_id;
         this.content = content;
         this.userName = username;
         this.color = color;
@@ -30,9 +30,9 @@ public class Item extends BaseModel {
         this.pos_y = pos_y;
     }
 
-    // name
-    public String getName(){return this.name;}
-    public void setName(String name){this.name = name;}
+    // theme_id
+    public long getTheme_id(){return this.theme_id;}
+    public void setTheme_id(long theme_id){this.theme_id = theme_id;}
 
     // content
     public String getContent(){return this.content;}
@@ -53,7 +53,7 @@ public class Item extends BaseModel {
     // set All Culomns
     public void setAllColumns(Cursor c){
         super.setCommonCulomns(c);
-        this.name = c.getString(c.getColumnIndex(KEY_NAME));
+        this.theme_id = c.getLong(c.getColumnIndex(KEY_THEME_ID));
         this.content = c.getString(c.getColumnIndex(KEY_CONTENT));
         this.userName = c.getString(c.getColumnIndex(KEY_USER_NAME));
         this.color = c.getString(c.getColumnIndex(KEY_COLOR));
