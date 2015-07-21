@@ -10,9 +10,14 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
 import jp.ac.titech.itpro.sdl.tabra.R;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
+import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,13 +32,21 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
 
     private OnFragmentInteractionListener mListener;
 
+    private ItemDataController mItemCtrl;
+
+    private EditText mContentEditView;
+    private TextView mContentTextView;
+    private TextView mUsernameTextView;
+    private TextView mCreatedAtTextView;
+
+    private String mPostitColor = "ffc0cb";
+
     public static BrainStormPostitCreateFragment newInstance() {
         BrainStormPostitCreateFragment fragment = new BrainStormPostitCreateFragment();
         return fragment;
     }
 
     public BrainStormPostitCreateFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -49,6 +62,16 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
 
         LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
         postitView.setOnTouchListener(this);
+
+        mContentEditView = (EditText)v.findViewById(R.id.postit_create_edit);
+        mContentTextView = (TextView)v.findViewById(R.id.postit_create_content);
+        mUsernameTextView = (TextView)v.findViewById(R.id.postit_create_username);
+        mCreatedAtTextView = (TextView)v.findViewById(R.id.postit_create_created_at);
+
+        String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
+        mUsernameTextView.setText(userName);
+
+        mItemCtrl = new ItemDataController(getActivity());
 
         return v;
     }
@@ -88,7 +111,7 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         return false;
     }
 
-    private void animateTransitionPostitView(View target, int dest) {
+    private void animateTransitionPostitView(final View target, int dest) {
         ObjectAnimator oa = ObjectAnimator.ofFloat(target, "y", target.getY(), dest);
         oa.setDuration(500);
         oa.addListener(new Animator.AnimatorListener() {
@@ -107,7 +130,17 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                
+                BrainStormMainActivity activity = (BrainStormMainActivity)getActivity();
+                Item item = new Item(
+                        activity.getmThemeId(),
+                        mContentTextView.getText().toString(),
+                        activity.getmUserName(),
+                        mPostitColor,
+                        (int)target.getX(),
+                        (int)target.getY()
+                );
+                mItemCtrl.createItem(item);
+                ((BrainStormMainActivity)getActivity()).popFragment();
             }
         });
         oa.start();
