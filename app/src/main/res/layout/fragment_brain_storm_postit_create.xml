@@ -73,45 +73,50 @@
             >
 
             <View
+                android:id="@+id/postit_color_red"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="#ffc0cb"
+                android:background="@color/postit_red"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 />
 
             <View
+                android:id="@+id/postit_color_yellow"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="#f0e68c"
+                android:background="@color/postit_yellow"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 />
 
             <View
+                android:id="@+id/postit_color_blue"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="#add8e6"
+                android:background="@color/postit_blue"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 />
 
             <View
+                android:id="@+id/postit_color_green"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="#98fb98"
+                android:background="@color/postit_green"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 />
 
             <View
+                android:id="@+id/postit_color_white"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="#f0f8ff"
+                android:background="@color/postit_white"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
