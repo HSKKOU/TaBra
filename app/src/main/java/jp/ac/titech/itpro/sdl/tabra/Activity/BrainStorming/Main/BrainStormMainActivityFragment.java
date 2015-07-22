@@ -107,16 +107,11 @@ public class BrainStormMainActivityFragment extends Fragment {
             View postitView = mPostitCtrl.createPostit(item);
             postitView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return onPostitTouch(v, event);
-                }
+                public boolean onTouch(View v, MotionEvent event) {return onPostitTouch(v, event);}
             });
             postitView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View v) {
-                    clickPostitLong(v);
-                    return true;
-                }
+                public boolean onLongClick(View v) {return clickPostitLong(v);}
             });
             mWhiteBoard.addView(postitView);
         }
@@ -126,8 +121,9 @@ public class BrainStormMainActivityFragment extends Fragment {
         Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
     }
 
-    private void clickPostitLong(View v) {
+    private boolean clickPostitLong(View v) {
         Toast.makeText(getActivity(), "Long Clicked", Toast.LENGTH_SHORT).show();
+        return false;
     }
 
     private void pushCreateButton(View v) {
@@ -172,7 +168,7 @@ public class BrainStormMainActivityFragment extends Fragment {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             mDown_Postit = new Point((int)event.getX(), (int)event.getY());
             mWhiteBoardSize = new Point(mWhiteBoard.getWidth(), mWhiteBoard.getHeight());
-            return true;
+            return false;
         } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
             float moveX = event.getX() - mDown_Postit.x;
             float moveY = event.getY() - mDown_Postit.y;
@@ -195,7 +191,10 @@ public class BrainStormMainActivityFragment extends Fragment {
             Rect moveViewRect = viewRect(v);
             Point moveViewCenter = moveViewRect.center();
 
-            return false;
+            if((int)moveX == 0 && (int)moveY == 0) {return false;}
+            v.setOnLongClickListener(null);
+            return true;
+
         } else if(event.getAction() == MotionEvent.ACTION_UP) {
             String idStr = ((TextView)v.findViewById(R.id.postit_hidden_id)).getText().toString();
             try{
@@ -204,9 +203,19 @@ public class BrainStormMainActivityFragment extends Fragment {
             }catch(Exception e){
                 Log.e(TAG, "Illegal id");
             }
+
+            v.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    clickPostitLong(v);
+                    return true;
+                }
+            });
+
+            return true;
         }
 
-        return false;
+        return true;
     }
 
     private Rect viewRect(View v) {
