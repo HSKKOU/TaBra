@@ -3,6 +3,7 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 import android.app.Fragment;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -35,11 +37,8 @@ public class BrainStormMainActivityFragment extends Fragment {
 
     private PostitController mPostitCtrl;
 
-    private int mScrollW;
-    private int mScrollH;
-
-    private int mWhiteBoardW = 1500;
-    private int mWhiteBoardH = 1000;
+    private Point mScrollSize = new Point(0,0);
+    private Point mWhiteBoardSize = new Point(0,0);
 
     private static final int kMargin = 50;
 
@@ -86,13 +85,14 @@ public class BrainStormMainActivityFragment extends Fragment {
 
         Point size = new Point();
         display.getSize(size);
-        mScrollW = size.x;
-        mScrollH = size.y - 400;
+        mScrollSize.x = size.x;
+        mScrollSize.y = size.y - 400;
 
-        int l = (mScrollW - mWhiteBoardW) / 2;
-        int t = (mScrollH - mWhiteBoardH) / 2;
-        mPostitCtrl.setCenter(mScrollW / 2, mScrollH / 2);
-        mWhiteBoard.layout(l, t, l + mWhiteBoardW, t + mWhiteBoardH);
+        int l = (mScrollSize.x - mWhiteBoard.getWidth()) / 2;
+        int t = (mScrollSize.y - mWhiteBoard.getHeight()) / 2;
+        mPostitCtrl.setCenter(mScrollSize.x / 2, mScrollSize.y / 2);
+        mWhiteBoardSize = new Point(mWhiteBoard.getWidth(), mWhiteBoard.getHeight());
+        mWhiteBoard.layout(l, t, l + mWhiteBoardSize.x, t + mWhiteBoardSize.y);
 
         mWhiteBoard.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -134,16 +134,14 @@ public class BrainStormMainActivityFragment extends Fragment {
         ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance(this.mPostitCtrl.getCenter()));
     }
 
-    private float mDownX_Whiteboard;
-    private float mDownY_Whiteboard;
+    private Point mDown_WhiteBoard = new Point(0,0);
     private boolean onWhiteBoardTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
-            mDownX_Whiteboard = event.getX();
-            mDownY_Whiteboard = event.getY();
+            mDown_WhiteBoard = new Point((int)event.getX(), (int)event.getY());
             return true;
         } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
-            float moveX = event.getX() - mDownX_Whiteboard;
-            float moveY = event.getY() - mDownY_Whiteboard;
+            float moveX = event.getX() - mDown_WhiteBoard.x;
+            float moveY = event.getY() - mDown_WhiteBoard.y;
 
             int w = v.getWidth();
             int h = v.getHeight();
@@ -155,11 +153,13 @@ public class BrainStormMainActivityFragment extends Fragment {
 
             if(l > kMargin){l = kMargin;}
             if(t > kMargin){t = kMargin;}
-            if(r < mScrollW - kMargin){l = mScrollW - kMargin - w;}
-            if(b < mScrollH - kMargin){t = mScrollH - kMargin - h;}
+            if(r < mScrollSize.x - kMargin){l = mScrollSize.x - kMargin - w;}
+            if(b < mScrollSize.y - kMargin){t = mScrollSize.y - kMargin - h;}
 
             setXY(v, l, t);
-            mPostitCtrl.setCenter(mScrollW/2 - l - kMargin, mScrollH/2 - t - kMargin);
+
+            Rect moveViewRect = viewRect(v);
+            mPostitCtrl.setCenter(mScrollSize.x / 2 - moveViewRect.x - kMargin, mScrollSize.y / 2 - moveViewRect.y - kMargin);
 
             return false;
         }
@@ -167,16 +167,15 @@ public class BrainStormMainActivityFragment extends Fragment {
         return false;
     }
 
-    private float mDownX_Postit;
-    private float mDownY_Postit;
+    private Point mDown_Postit;
     private boolean onPostitTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
-            mDownX_Postit = event.getX();
-            mDownY_Postit = event.getY();
+            mDown_Postit = new Point((int)event.getX(), (int)event.getY());
+            mWhiteBoardSize = new Point(mWhiteBoard.getWidth(), mWhiteBoard.getHeight());
             return true;
         } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
-            float moveX = event.getX() - mDownX_Postit;
-            float moveY = event.getY() - mDownY_Postit;
+            float moveX = event.getX() - mDown_Postit.x;
+            float moveY = event.getY() - mDown_Postit.y;
 
             int w = v.getWidth();
             int h = v.getHeight();
@@ -188,19 +187,52 @@ public class BrainStormMainActivityFragment extends Fragment {
 
             if(l < kMargin){l = kMargin;}
             if(t < kMargin){t = kMargin;}
-            if(r > mScrollW - kMargin*2){l = mScrollW - kMargin*2 - w;}
-            if(b > mScrollH - kMargin*2){t = mScrollH - kMargin*2 - h;}
+            if(r > mWhiteBoardSize.x - kMargin){l = mWhiteBoardSize.x - kMargin - w;}
+            if(b > mWhiteBoardSize.y - kMargin){t = mWhiteBoardSize.y - kMargin - h;}
 
             setXY(v, l, t);
 
+            Rect moveViewRect = viewRect(v);
+            Point moveViewCenter = moveViewRect.center();
+
             return false;
+        } else if(event.getAction() == MotionEvent.ACTION_UP) {
+            String idStr = ((TextView)v.findViewById(R.id.postit_hidden_id)).getText().toString();
+            try{
+                long id = Long.parseLong(idStr);
+                mItemCtrl.updateItemPosition(id, (int)v.getX(), (int)v.getY());
+            }catch(Exception e){
+                Log.e(TAG, "Illegal id");
+            }
         }
 
         return false;
     }
 
+    private Rect viewRect(View v) {
+        return new Rect((int)v.getX(), (int)v.getY(), v.getWidth(), v.getHeight());
+    }
+
     private void setXY(View v, int x, int y){
         v.setX(x);
         v.setY(y);
+    }
+}
+
+class Rect {
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+
+    public Rect(int x, int y, int w, int h) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    }
+
+    public Point center() {
+        return new Point(x + width/2, y + height/2);
     }
 }
