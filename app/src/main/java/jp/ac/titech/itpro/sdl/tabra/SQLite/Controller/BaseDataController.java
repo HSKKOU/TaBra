@@ -24,12 +24,21 @@ public class BaseDataController {
         this.tableName = _tableName;
     }
 
-    protected long createModel(ContentValues _v){
+    protected long createModel(ContentValues _v) {
         db = dbHelper.getWritableDatabase();
         long now = (new Date()).getTime();
         _v.put(KEY_CREATED_AT, now);
         _v.put(KEY_UPDATED_AT, now);
         long id = db.insert(this.tableName, null, _v);
+        db.close();
+        return id;
+    }
+
+    protected long updateModel(ContentValues _v, String _selection, String[] _selectionArgs) {
+        db = dbHelper.getWritableDatabase();
+        long now = (new Date()).getTime();
+        _v.put(KEY_UPDATED_AT, now);
+        long id = db.update(this.tableName, _v, _selection, _selectionArgs);
         db.close();
         return id;
     }
