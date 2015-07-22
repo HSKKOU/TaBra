@@ -74,4 +74,17 @@ public class ItemDataController extends BaseDataController {
     public List<Item> getAllItems() {
         return this.getAllItems(-1);
     }
+
+    public void updateItemPosition(long id, int x, int y) {
+        db = dbHelper.getReadableDatabase();
+        List<Item> itemList = new ArrayList<Item>();
+
+        if(id <= 0){return;}
+
+        ContentValues v = new ContentValues();
+        v.put(KEY_POS_X, x+"");
+        v.put(KEY_POS_Y, y+"");
+        super.updateModel(v, "id=?", new String[]{id+""});
+        db.close();
+    }
 }
