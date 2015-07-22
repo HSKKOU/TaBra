@@ -9,6 +9,7 @@ import java.util.List;
 
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.ITEM_COLUMS;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_X;
@@ -38,11 +39,26 @@ public class ItemDataController extends BaseDataController {
         return super.createModel(v);
     }
 
-    public List<Item> getAllItems(){
+    public List<Item> getAllItems(long theme_id) {
         db = dbHelper.getReadableDatabase();
         List<Item> itemList = new ArrayList<Item>();
 
-        Cursor c = db.query(this.tableName, null, null, null, null, null, null);
+        String themeSelectStr = null;
+        String[] selectionArgs = null;
+        if(theme_id >= 0){
+            themeSelectStr = KEY_THEME_ID + " = ?";
+            selectionArgs = new String[]{theme_id+""};
+        }
+
+        Cursor c = db.query(
+                this.tableName,
+                ITEM_COLUMS,
+                themeSelectStr,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
         if (c.moveToFirst()) {
             do {
                 Item i = new Item();
@@ -53,5 +69,9 @@ public class ItemDataController extends BaseDataController {
 
         db.close();
         return itemList;
+    }
+
+    public List<Item> getAllItems() {
+        return this.getAllItems(-1);
     }
 }
