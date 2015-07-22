@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,12 +15,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
-import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.PostitController;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.PostitFactory;
+import jp.ac.titech.itpro.sdl.tabra.Activity.SpeechRecognizer.VoiceRecog;
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
@@ -32,7 +36,7 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
  * Use the {@link BrainStormPostitCreateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener {
+public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener, VoiceRecog.OnVoiceRecog {
     private static final String TAG = BrainStormPostitCreateFragment.class.getSimpleName();
     private static final String CENTERX = "centerX";
     private static final String CENTERY = "centerY";
@@ -45,6 +49,9 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     private TextView mContentTextView;
     private TextView mUsernameTextView;
     private TextView mCreatedAtTextView;
+    private ImageButton mMicButton;
+
+    private VoiceRecog mVoiceRecog;
 
     private String mPostitColor = "postit_red";
 
@@ -70,6 +77,8 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
             int cy = getArguments().getInt(CENTERY);
             this.mMainFragmentCenter = new Point(cx, cy);
         }
+
+        mVoiceRecog = new VoiceRecog(getActivity(), this);
     }
 
     @Override
@@ -78,13 +87,25 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_brain_storm_postit_create, container, false);
 
-        final LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
-        postitView.setOnTouchListener(this);
-
         mContentEditView = (EditText)v.findViewById(R.id.postit_create_edit);
         mContentTextView = (TextView)v.findViewById(R.id.postit_create_content);
         mUsernameTextView = (TextView)v.findViewById(R.id.postit_create_username);
         mCreatedAtTextView = (TextView)v.findViewById(R.id.postit_create_created_at);
+        mMicButton = (ImageButton)v.findViewById(R.id.postit_create_mic_button);
+
+        setListeners(v);
+
+        String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
+        mUsernameTextView.setText(userName);
+
+        mItemCtrl = new ItemDataController(getActivity());
+
+        return v;
+    }
+
+    private void setListeners(View v) {
+        final LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
+        postitView.setOnTouchListener(this);
 
         v.findViewById(R.id.postit_color_red).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,24 +137,31 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 mContentTextView.setText(s);
             }
         });
 
-        String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
-        mUsernameTextView.setText(userName);
+        mMicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mVoiceRecog.startRecognize();
+            }
+        });
 
-        mItemCtrl = new ItemDataController(getActivity());
-
-        return v;
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                keyboardHide();
+            }
+        });
     }
 
     private void changePostitColor(String color, View v){
+        keyboardHide();
         mPostitColor = color;
-        int colorHex = PostitController.colorStr2Int(getActivity(), color);
+        int colorHex = PostitFactory.colorStr2Int(getActivity(), color);
         v.setBackgroundColor(colorHex);
     }
 
@@ -141,6 +169,7 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     private int defY;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        keyboardHide();
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 defY = (int)v.getY();
@@ -160,7 +189,8 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
                     return false;
                 }
 
-                if (v.getY() < defY - v.getHeight() / 4) {
+                String contentText = mContentEditView.getText().toString();
+                if (v.getY() < defY - v.getHeight() / 4 && !"".equals(contentText)) {
                     this.animateTransitionPostitView(v, v.getHeight()*(-1));
                 } else {
                     this.animateTransitionPostitView(v, defY);
@@ -206,6 +236,20 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
             }
         });
         oa.start();
+    }
+
+    private void keyboardHide() {
+        Activity activity = getActivity();
+        View focusView = activity.getCurrentFocus();
+        if (focusView != null) {
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(focusView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    @Override
+    public void onReciveVoice(String voiceStr) {
+        mContentEditView.setText(voiceStr);
     }
 
     public void onButtonPressed(Uri uri) {

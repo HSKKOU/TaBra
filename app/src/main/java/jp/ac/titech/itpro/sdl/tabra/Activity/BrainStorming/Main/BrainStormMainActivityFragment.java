@@ -3,7 +3,6 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main;
 import android.app.Fragment;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class BrainStormMainActivityFragment extends Fragment implements View.OnTouchListener {
+public class BrainStormMainActivityFragment extends Fragment {
 
     private static final String TAG = BrainStormMainActivityFragment.class.getSimpleName();
 
@@ -62,7 +62,7 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
         mWhiteBoard = (AbsoluteLayout)v.findViewById(R.id.brainstorm_main_whiteboard);
         mCreatePostitButton = (Button)v.findViewById(R.id.brainstorm_main_create_postit_button);
 
-        mPostitCtrl = new PostitController(getActivity(), mWhiteBoard);
+        mPostitCtrl = new PostitController(getActivity());
 
         mCreatePostitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,43 +91,59 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
 
         int l = (mScrollW - mWhiteBoardW) / 2;
         int t = (mScrollH - mWhiteBoardH) / 2;
-        mPostitCtrl.setCenter(mScrollW/2, mScrollH/2);
+        mPostitCtrl.setCenter(mScrollW / 2, mScrollH / 2);
         mWhiteBoard.layout(l, t, l + mWhiteBoardW, t + mWhiteBoardH);
 
-        mWhiteBoard.setOnTouchListener(this);
+        mWhiteBoard.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {return onWhiteBoardTouch(v, event);}
+        });
     }
 
     private void setPostits() {
-        List<Item> itemList = mItemCtrl.getAllItems();
+        BrainStormMainActivity activity = (BrainStormMainActivity)getActivity();
+        List<Item> itemList = mItemCtrl.getAllItems(activity.getmThemeId());
         for(Item item: itemList){
-            Log.d(TAG, "------------------");
-            Log.d(TAG, item.getId() + "");
-            Log.d(TAG, item.getTheme_id() + "");
-            Log.d(TAG, item.getContent());
-            Log.d(TAG, item.getUserName());
-            Log.d(TAG, item.getColor());
-            Log.d(TAG, item.getPos_x() + "," + item.getPos_y());
-            mPostitCtrl.createPostit(item);
+            View postitView = mPostitCtrl.createPostit(item);
+            postitView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return onPostitTouch(v, event);
+                }
+            });
+            postitView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    clickPostitLong(v);
+                    return true;
+                }
+            });
+            mWhiteBoard.addView(postitView);
         }
-        Log.d(TAG, "------------------");
+    }
+
+    private void clickPostit(View v) {
+        Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    private void clickPostitLong(View v) {
+        Toast.makeText(getActivity(), "Long Clicked", Toast.LENGTH_SHORT).show();
     }
 
     private void pushCreateButton(View v) {
         ((BrainStormMainActivity)getActivity()).pushFragment(BrainStormPostitCreateFragment.newInstance(this.mPostitCtrl.getCenter()));
     }
 
-    private float mDownX;
-    private float mDownY;
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    private float mDownX_Whiteboard;
+    private float mDownY_Whiteboard;
+    private boolean onWhiteBoardTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
-            mDownX = event.getX();
-            mDownY = event.getY();
-
+            mDownX_Whiteboard = event.getX();
+            mDownY_Whiteboard = event.getY();
             return true;
         } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
-            float moveX = event.getX() - mDownX;
-            float moveY = event.getY() - mDownY;
+            float moveX = event.getX() - mDownX_Whiteboard;
+            float moveY = event.getY() - mDownY_Whiteboard;
 
             int w = v.getWidth();
             int h = v.getHeight();
@@ -142,8 +158,7 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
             if(r < mScrollW - kMargin){l = mScrollW - kMargin - w;}
             if(b < mScrollH - kMargin){t = mScrollH - kMargin - h;}
 
-            v.setX(l);
-            v.setY(t);
+            setXY(v, l, t);
             mPostitCtrl.setCenter(mScrollW/2 - l - kMargin, mScrollH/2 - t - kMargin);
 
             return false;
@@ -152,4 +167,40 @@ public class BrainStormMainActivityFragment extends Fragment implements View.OnT
         return false;
     }
 
+    private float mDownX_Postit;
+    private float mDownY_Postit;
+    private boolean onPostitTouch(View v, MotionEvent event) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN){
+            mDownX_Postit = event.getX();
+            mDownY_Postit = event.getY();
+            return true;
+        } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
+            float moveX = event.getX() - mDownX_Postit;
+            float moveY = event.getY() - mDownY_Postit;
+
+            int w = v.getWidth();
+            int h = v.getHeight();
+
+            int l = (int)(v.getX() + moveX);
+            int t = (int)(v.getY() + moveY);
+            int r = l + w;
+            int b = t + h;
+
+            if(l < kMargin){l = kMargin;}
+            if(t < kMargin){t = kMargin;}
+            if(r > mScrollW - kMargin*2){l = mScrollW - kMargin*2 - w;}
+            if(b > mScrollH - kMargin*2){t = mScrollH - kMargin*2 - h;}
+
+            setXY(v, l, t);
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private void setXY(View v, int x, int y){
+        v.setX(x);
+        v.setY(y);
+    }
 }
