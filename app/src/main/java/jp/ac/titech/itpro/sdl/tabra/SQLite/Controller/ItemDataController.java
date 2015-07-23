@@ -15,6 +15,7 @@ import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CO
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_X;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_Y;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_SERVER_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.TABLE_ITEMS;
@@ -32,6 +33,7 @@ public class ItemDataController extends BaseDataController {
     public long createItem(Item item){
         ContentValues v = new ContentValues();
         v.put(KEY_THEME_ID, item.getTheme_id());
+        v.put(KEY_SERVER_ID, item.getServer_id());
         v.put(KEY_CONTENT, item.getContent());
         v.put(KEY_USER_NAME, item.getUserName());
         v.put(KEY_COLOR, item.getColor());
@@ -47,9 +49,11 @@ public class ItemDataController extends BaseDataController {
         String themeSelectStr = null;
         String[] selectionArgs = null;
         if(theme_id >= 0){
-            themeSelectStr = KEY_THEME_ID + " = ?";
+            themeSelectStr = KEY_THEME_ID + "=?";
             selectionArgs = new String[]{theme_id+""};
         }
+
+        Log.d(TAG, KEY_THEME_ID + ":" + theme_id);
 
         Cursor c = db.query(
                 this.tableName,
@@ -94,8 +98,8 @@ public class ItemDataController extends BaseDataController {
         Cursor c = db.query(
                 this.tableName,
                 ITEM_COLUMS,
-                "id=?",
-                new String[]{id+""},
+                KEY_SERVER_ID+"=?",
+                new String[]{id + ""},
                 null,
                 null,
                 null,
@@ -112,6 +116,13 @@ public class ItemDataController extends BaseDataController {
         db.close();
 
         return item;
+    }
+
+    public int deleteAllByThemeId(String themeId) {
+        db = dbHelper.getWritableDatabase();
+        int num = db.delete(this.tableName, KEY_THEME_ID+"=?", new String[]{themeId});
+        db.close();
+        return num;
     }
 
     public void updateItem(Item item) {

@@ -7,6 +7,7 @@ import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CO
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CONTENT;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_X;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_POS_Y;
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_SERVER_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 
@@ -15,6 +16,7 @@ import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_US
  */
 public class Item extends BaseModel {
     private long theme_id;
+    private long server_id;
     private String content;
     private String userName;
     private String color;
@@ -23,9 +25,10 @@ public class Item extends BaseModel {
 
     public Item(){}
 
-    public Item(long theme_id, String content, String username, String color, int pos_x, int pos_y){
+    public Item(long theme_id, long server_id , String content, String username, String color, int pos_x, int pos_y){
         super();
         this.theme_id = theme_id;
+        this.server_id = server_id;
         this.content = content;
         this.userName = username;
         this.color = color;
@@ -36,6 +39,10 @@ public class Item extends BaseModel {
     // theme_id
     public long getTheme_id(){return this.theme_id;}
     public void setTheme_id(long theme_id){this.theme_id = theme_id;}
+
+    // server_id
+    public long getServer_id() {return server_id;}
+    public void setServer_id(long server_id) {this.server_id = server_id;}
 
     // content
     public String getContent(){return this.content;}
@@ -57,6 +64,7 @@ public class Item extends BaseModel {
     public void setAllColumns(Cursor c){
         super.setCommonCulomns(c);
         this.theme_id = c.getLong(c.getColumnIndex(KEY_THEME_ID));
+        this.server_id = c.getLong(c.getColumnIndex(KEY_SERVER_ID));
         this.content = c.getString(c.getColumnIndex(KEY_CONTENT));
         this.userName = c.getString(c.getColumnIndex(KEY_USER_NAME));
         this.color = c.getString(c.getColumnIndex(KEY_COLOR));
@@ -67,6 +75,7 @@ public class Item extends BaseModel {
     public ContentValues trans2ContentValue() {
         ContentValues c = super.trans2ContentValue();
         c.put(KEY_THEME_ID, this.theme_id);
+        c.put(KEY_SERVER_ID, this.server_id);
         c.put(KEY_CONTENT, this.content);
         c.put(KEY_USER_NAME, this.userName);
         c.put(KEY_COLOR, this.color);
@@ -77,6 +86,7 @@ public class Item extends BaseModel {
 
     public String toString() {
         return "id:" + this.getId()
+                + "server_id" + this.getServer_id()
                 + "theme_id" + this.getTheme_id()
                 + "content" + this.getContent()
                 + "userName" + this.getUserName()
