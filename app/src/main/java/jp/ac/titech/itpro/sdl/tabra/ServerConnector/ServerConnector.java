@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class ServerConnector extends AsyncTask<String, Integer, String> {
     public interface ServerConnectorDelegate {
-        void recieveResponse(String responseStr);
+        void recieveResponse(String serverConnectorId, String responseStr);
     }
 
     public static final String GET = "GET";         // 取得
@@ -41,6 +41,8 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     public static final String CHAR_SET = "UTF-8";
 
     private ServerConnectorDelegate delegate;
+
+    private String serverConnectorId;
 
     public ServerConnector(ServerConnectorDelegate delegate) {
         this.delegate = delegate;
@@ -96,14 +98,16 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     protected String doInBackground(String... params) {
         Log.d(TAG, "doInBackground");
 
-        String typeStr = "/" + params[0];
-        String idStr = params[1];
+        serverConnectorId = params[0];
+
+        String typeStr = "/" + params[1];
+        String idStr = params[2];
 
         if(!"".equals(idStr)){
             idStr = "/" + idStr;
         }
-        String method = params[2];
-        String queryStr = params[3];
+        String method = params[3];
+        String queryStr = params[4];
 
         String urlStr = API_BASE_URL + typeStr + idStr;
         Log.d(TAG, urlStr + ", " + method + ", " + queryStr);
@@ -122,6 +126,6 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String s) {
         if(s != null) Log.d(TAG, s);
-        this.delegate.recieveResponse(s);
+        this.delegate.recieveResponse(serverConnectorId, s);
     }
 }
