@@ -1,5 +1,6 @@
 package jp.ac.titech.itpro.sdl.tabra.SQLite.Model;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_COLOR;
@@ -61,5 +62,24 @@ public class Item extends BaseModel {
         this.color = c.getString(c.getColumnIndex(KEY_COLOR));
         this.pos_x = c.getInt(c.getColumnIndex(KEY_POS_X));
         this.pos_y = c.getInt(c.getColumnIndex(KEY_POS_Y));
+    }
+
+    public ContentValues trans2ContentValue() {
+        ContentValues c = super.trans2ContentValue();
+        c.put(KEY_THEME_ID, this.theme_id);
+        c.put(KEY_CONTENT, this.content);
+        c.put(KEY_USER_NAME, this.userName);
+        c.put(KEY_COLOR, this.color);
+        c.put(KEY_POS_X, this.pos_x);
+        c.put(KEY_POS_Y, this.pos_y);
+        return c;
+    }
+
+    public String toString() {
+        return "id:" + this.getId()
+                + "theme_id" + this.getTheme_id()
+                + "content" + this.getContent()
+                + "userName" + this.getUserName()
+                + "color" + this.getColor();
     }
 }

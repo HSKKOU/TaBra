@@ -3,6 +3,7 @@ package jp.ac.titech.itpro.sdl.tabra.SQLite.Controller;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,15 +77,47 @@ public class ItemDataController extends BaseDataController {
     }
 
     public void updateItemPosition(long id, int x, int y) {
-        db = dbHelper.getReadableDatabase();
-        List<Item> itemList = new ArrayList<Item>();
-
         if(id <= 0){return;}
-
         ContentValues v = new ContentValues();
         v.put(KEY_POS_X, x+"");
         v.put(KEY_POS_Y, y+"");
         super.updateModel(v, "id=?", new String[]{id+""});
+        db.close();
+    }
+
+    public Item getItem(long id) {
+        db = dbHelper.getReadableDatabase();
+        if(id <= 0){return null;}
+
+        Item item = new Item();
+
+        Cursor c = db.query(
+                this.tableName,
+                ITEM_COLUMS,
+                "id=?",
+                new String[]{id+""},
+                null,
+                null,
+                null,
+                "1"
+        );
+
+        if (c.moveToFirst()) {
+            item.setAllColumns(c);
+        }else{
+            Log.d(TAG, "null");
+            item = null;
+        }
+
+        db.close();
+
+        return item;
+    }
+
+    public void updateItem(Item item) {
+        if(item.getId() <= 0){return;}
+        ContentValues c = item.trans2ContentValue();
+        super.updateModel(c, "id=?", new String[]{item.getId()+""});
         db.close();
     }
 }

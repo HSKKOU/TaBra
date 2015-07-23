@@ -11,10 +11,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit.BrainStormPostitCreateFragment;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.DetailPostit.BrainStormPostitDetailFragment;
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.BrainStormMainActivityFragment;
 import jp.ac.titech.itpro.sdl.tabra.R;
 
-public class BrainStormMainActivity extends Activity implements BrainStormPostitCreateFragment.OnFragmentInteractionListener {
+public class BrainStormMainActivity extends Activity implements
+        BrainStormPostitCreateFragment.OnFragmentInteractionListener,
+        BrainStormPostitDetailFragment.OnFragmentInteractionListener
+{
     private static final String TAG = BrainStormMainActivity.class.getSimpleName();
 
     public static final String PARAM_THEME_ID = "THEME_ID";

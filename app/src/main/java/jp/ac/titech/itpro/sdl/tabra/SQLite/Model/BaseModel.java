@@ -1,5 +1,6 @@
 package jp.ac.titech.itpro.sdl.tabra.SQLite.Model;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_CREATED_AT;
@@ -33,5 +34,13 @@ public class BaseModel {
         this.id = c.getLong(c.getColumnIndex(KEY_ID));
         this.created_at = c.getLong(c.getColumnIndex(KEY_CREATED_AT));
         this.updated_at = c.getLong(c.getColumnIndex(KEY_UPDATED_AT));
+    }
+
+    public ContentValues trans2ContentValue() {
+        ContentValues c = new ContentValues();
+        c.put(KEY_ID, this.id);
+        c.put(KEY_CREATED_AT, this.created_at);
+        c.put(KEY_UPDATED_AT, this.updated_at);
+        return c;
     }
 }

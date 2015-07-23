@@ -20,6 +20,7 @@ import java.util.List;
 
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.CreatePostit.BrainStormPostitCreateFragment;
+import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.DetailPostit.BrainStormPostitDetailFragment;
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
@@ -44,6 +45,8 @@ public class BrainStormMainActivityFragment extends Fragment {
 
     private ItemDataController mItemCtrl;
 
+    private BrainStormMainActivity mActivity;
+
     public static BrainStormMainActivityFragment newInstance() {
         BrainStormMainActivityFragment fragment = new BrainStormMainActivityFragment();
         return fragment;
@@ -56,6 +59,8 @@ public class BrainStormMainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_brain_storm_main, container, false);
+
+        mActivity = (BrainStormMainActivity)getActivity();
 
         mCustomScrollView = (LinearLayout)v.findViewById(R.id.brainstorm_main_custom_scrollview);
         mWhiteBoard = (AbsoluteLayout)v.findViewById(R.id.brainstorm_main_whiteboard);
@@ -109,10 +114,10 @@ public class BrainStormMainActivityFragment extends Fragment {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {return onPostitTouch(v, event);}
             });
-            postitView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {return clickPostitLong(v);}
-            });
+//            postitView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {return clickPostitLong(v);}
+//            });
             mWhiteBoard.addView(postitView);
         }
     }
@@ -123,6 +128,8 @@ public class BrainStormMainActivityFragment extends Fragment {
 
     private boolean clickPostitLong(View v) {
         Toast.makeText(getActivity(), "Long Clicked", Toast.LENGTH_SHORT).show();
+        String itemIdStr = ((TextView)v.findViewById(R.id.postit_hidden_id)).getText().toString();
+        mActivity.pushFragment(BrainStormPostitDetailFragment.newInstance(itemIdStr));
         return false;
     }
 
@@ -168,6 +175,12 @@ public class BrainStormMainActivityFragment extends Fragment {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             mDown_Postit = new Point((int)event.getX(), (int)event.getY());
             mWhiteBoardSize = new Point(mWhiteBoard.getWidth(), mWhiteBoard.getHeight());
+            v.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return clickPostitLong(v);
+                }
+            });
             return false;
         } else if(event.getAction() == MotionEvent.ACTION_MOVE) {
             float moveX = event.getX() - mDown_Postit.x;
@@ -203,14 +216,6 @@ public class BrainStormMainActivityFragment extends Fragment {
             }catch(Exception e){
                 Log.e(TAG, "Illegal id");
             }
-
-            v.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    clickPostitLong(v);
-                    return true;
-                }
-            });
 
             return true;
         }

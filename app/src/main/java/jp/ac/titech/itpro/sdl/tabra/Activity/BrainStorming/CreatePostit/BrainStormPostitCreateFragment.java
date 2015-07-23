@@ -50,6 +50,7 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     private TextView mUsernameTextView;
     private TextView mCreatedAtTextView;
     private ImageButton mMicButton;
+    private LinearLayout mPostitView;
 
     private VoiceRecog mVoiceRecog;
 
@@ -78,6 +79,7 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
             this.mMainFragmentCenter = new Point(cx, cy);
         }
 
+        mItemCtrl = new ItemDataController(getActivity());
         mVoiceRecog = new VoiceRecog(getActivity(), this);
     }
 
@@ -98,34 +100,31 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
         mUsernameTextView.setText(userName);
 
-        mItemCtrl = new ItemDataController(getActivity());
-
         return v;
     }
 
     private void setListeners(View v) {
-        final LinearLayout postitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
-        postitView.setOnTouchListener(this);
+        mPostitView.setOnTouchListener(this);
 
         v.findViewById(R.id.postit_color_red).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {changePostitColor("postit_red", postitView);}
+            public void onClick(View v) {changePostitColor("postit_red", mPostitView);}
         });
         v.findViewById(R.id.postit_color_yellow).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {changePostitColor("postit_yellow", postitView);}
+            public void onClick(View v) {changePostitColor("postit_yellow", mPostitView);}
         });
         v.findViewById(R.id.postit_color_blue).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {changePostitColor("postit_blue", postitView);}
+            public void onClick(View v) {changePostitColor("postit_blue", mPostitView);}
         });
         v.findViewById(R.id.postit_color_green).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {changePostitColor("postit_green", postitView);}
+            public void onClick(View v) {changePostitColor("postit_green", mPostitView);}
         });
         v.findViewById(R.id.postit_color_white).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {changePostitColor("postit_white", postitView);}
+            public void onClick(View v) {changePostitColor("postit_white", mPostitView);}
         });
 
         mContentEditView.addTextChangedListener(new TextWatcher() {
