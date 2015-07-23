@@ -95,6 +95,8 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
         mCreatedAtTextView = (TextView)v.findViewById(R.id.postit_create_created_at);
         mMicButton = (ImageButton)v.findViewById(R.id.postit_create_mic_button);
 
+        mPostitView = (LinearLayout)v.findViewById(R.id.postit_create_postit);
+
         setListeners(v);
 
         String userName = ((BrainStormMainActivity)getActivity()).getmUserName();
