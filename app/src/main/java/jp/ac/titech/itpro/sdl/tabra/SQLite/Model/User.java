@@ -9,19 +9,25 @@ import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_US
  */
 public class User extends BaseModel {
     private String name;
+    private String passwd;
 
     public User(){
         super();
     }
 
-    public User(String name){
+    public User(String name, String passwd){
         super();
         this.name = name;
+        this.passwd = passwd;
     }
 
     // password
     public String getName(){return this.name;}
     public void setName(String name){this.name = name;}
+
+    // passwd
+    public String getPasswd() {return passwd;}
+    public void setPasswd(String passwd) {this.passwd = passwd;}
 
     // set All Culomns
     public void setAllColumns(Cursor c){

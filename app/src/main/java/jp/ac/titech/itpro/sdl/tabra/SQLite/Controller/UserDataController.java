@@ -6,6 +6,7 @@ import android.database.Cursor;
 
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.User;
 
+import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_PASSWD;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.KEY_USER_NAME;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.TABLE_USERS;
 import static jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.DBOpenHelper.USER_COLUMS;
@@ -24,7 +25,29 @@ public class UserDataController extends BaseDataController {
     public long createUser(User user){
         ContentValues v = new ContentValues();
         v.put(KEY_USER_NAME, user.getName());
+        v.put(KEY_PASSWD, user.getPasswd());
         return super.createModel(v);
+    }
+
+    public String validateUserPasswd(String username, String passwd) {
+        db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(
+                this.tableName,
+                USER_COLUMS,
+                KEY_USER_NAME + "=? AND " + KEY_PASSWD + "=?",
+                new String[]{username, passwd},
+                null,
+                null,
+                null,
+                null
+        );
+        String ret = "";
+        if(c.moveToFirst()){
+            ret = c.getString(c.getColumnIndex(KEY_USER_NAME));
+        }
+
+        db.close();
+        return ret;
     }
 
     public String getExistUser(){
