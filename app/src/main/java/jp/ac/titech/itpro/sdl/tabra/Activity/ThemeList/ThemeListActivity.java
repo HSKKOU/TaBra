@@ -27,11 +27,12 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ThemeDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.UserDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Theme;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.User;
+import jp.ac.titech.itpro.sdl.tabra.ServerConnector.ServerConnector;
 
 import static jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity.PARAM_THEME_ID;
 import static jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity.PARAM_USER_NAME;
 
-public class ThemeListActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class ThemeListActivity extends Activity implements AdapterView.OnItemClickListener {
     private static final String TAG = ThemeListActivity.class.getSimpleName();
 
     private ListView mThemeListView;
@@ -49,12 +50,14 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
 
         mThemeListView = (ListView)findViewById(R.id.theme_listview);
         mThemeListView.setOnItemClickListener(this);
-        mThemeListView.setOnItemLongClickListener(this);
 
         mUserDataCtrl = new UserDataController(this);
         mThemeDataCtrl = new ThemeDataController(this);
 
         this.init();
+
+        PlayGround pg = new PlayGround();
+        pg.testGET();
     }
 
     private void init() {
@@ -68,15 +71,15 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
     }
 
     private void showRegisterUser() {
-        final EditText edt = new EditText(ThemeListActivity.this);
+        final EditText edtUN = new EditText(ThemeListActivity.this);
         new AlertDialog.Builder(ThemeListActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("使用するユーザー名を入力してください")
-                .setView(edt)
+                .setView(edtUN)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String userName = edt.getText().toString();
+                        String userName = edtUN.getText().toString();
                         registerUserName(userName);
                     }
                 }).show();
@@ -164,11 +167,23 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
         startActivity(intent);
     }
 
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        ListView listView = (ListView)parent;
+    class PlayGround implements ServerConnector.ServerConnectorDelegate {
+        private final String TAG = PlayGround.class.getSimpleName();
 
-        return false;
+        private ServerConnector sc;
+
+        public PlayGround() {
+            this.sc = new ServerConnector(this);
+        }
+
+        public void testGET() {
+            sc.execute(ServerConnector.USERS, "", ServerConnector.POST, "type=get_theme_ids&name=aaa");
+        }
+
+        @Override
+        public void recieveResponse(String responseStr) {
+            Log.d(TAG, "response: " + responseStr);
+        }
     }
 
     @Override
