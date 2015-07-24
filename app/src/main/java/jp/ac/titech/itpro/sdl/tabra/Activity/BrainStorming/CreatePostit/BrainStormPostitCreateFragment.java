@@ -21,12 +21,16 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.Main.PostitFactory;
 import jp.ac.titech.itpro.sdl.tabra.Activity.SpeechRecognizer.VoiceRecog;
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
+import jp.ac.titech.itpro.sdl.tabra.ServerConnector.ServerConnector;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,10 +40,12 @@ import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
  * Use the {@link BrainStormPostitCreateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener, VoiceRecog.OnVoiceRecog {
+public class BrainStormPostitCreateFragment extends Fragment implements View.OnTouchListener, VoiceRecog.OnVoiceRecog, ServerConnector.ServerConnectorDelegate {
     private static final String TAG = BrainStormPostitCreateFragment.class.getSimpleName();
     private static final String CENTERX = "centerX";
     private static final String CENTERY = "centerY";
+
+    private static final String CREATE_ITEM = "CREATE_ITEM";
 
     private OnFragmentInteractionListener mListener;
 
@@ -57,6 +63,8 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
     private String mPostitColor = "postit_red";
 
     private Point mMainFragmentCenter;
+
+    private BrainStormMainActivity mActivity;
 
     public static BrainStormPostitCreateFragment newInstance(Point center) {
         BrainStormPostitCreateFragment fragment = new BrainStormPostitCreateFragment();
@@ -88,6 +96,8 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_brain_storm_postit_create, container, false);
+
+        mActivity = (BrainStormMainActivity)getActivity();
 
         mContentEditView = (EditText)v.findViewById(R.id.postit_create_edit);
         mContentTextView = (TextView)v.findViewById(R.id.postit_create_content);
@@ -210,10 +220,12 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
             public void onAnimationStart(Animator animation) {
 
             }
+
             @Override
             public void onAnimationCancel(Animator animation) {
 
             }
+
             @Override
             public void onAnimationRepeat(Animator animation) {
 
@@ -221,22 +233,63 @@ public class BrainStormPostitCreateFragment extends Fragment implements View.OnT
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if(dest == defY){return;}
-                BrainStormMainActivity activity = (BrainStormMainActivity)getActivity();
-                Log.d(TAG, mMainFragmentCenter.x + "," + mMainFragmentCenter.y);
-                Item item = new Item(
-                        activity.getmThemeId(),
-                        mContentTextView.getText().toString(),
-                        activity.getmUserName(),
-                        mPostitColor,
-                        mMainFragmentCenter.x,
-                        mMainFragmentCenter.y
-                );
-                mItemCtrl.createItem(item);
-                ((BrainStormMainActivity)getActivity()).popFragment();
+                if (dest == defY) {
+                    return;
+                }
+                sendItem();
             }
         });
         oa.start();
+    }
+
+    private void sendItem() {
+        String queryStr =
+                "type=create_item"
+                + "&theme_id=" + mActivity.getmServerThemeId()
+                + "&content=" + mContentTextView.getText().toString()
+                + "&username=" + mActivity.getmUserName()
+                + "&color=" + mPostitColor
+                + "&pos_x=" + mMainFragmentCenter.x
+                + "&pos_y=" + mMainFragmentCenter.y;
+        (new ServerConnector(this)).execute(CREATE_ITEM, ServerConnector.ITEMS, "", ServerConnector.POST, queryStr);
+    }
+
+    @Override
+    public void recieveResponse(String serverConnectorId, String responseStr) {
+        JSONObject json = null;
+        try{
+            json = new JSONObject(responseStr);
+            String result = json.getString("result");
+            if(!"success".equals(result)){
+                Log.d(TAG, "failed");
+                return;
+            }
+            if(CREATE_ITEM.equals(serverConnectorId)){
+                finishCreateItem(json);
+            }
+        }catch(JSONException e){
+            Log.d(TAG, "json parse error");
+        }
+    }
+
+    private void finishCreateItem(JSONObject json) throws JSONException {
+        JSONObject jo = json.getJSONObject("data");
+        try{
+            long sid = Long.parseLong(mActivity.getmServerThemeId());
+            Item item = new Item(
+                    jo.getLong("theme_id"),
+                    sid,
+                    jo.getString("content"),
+                    jo.getString("username"),
+                    jo.getString("color"),
+                    jo.getInt("pos_x"),
+                    jo.getInt("pos_y")
+            );
+            mItemCtrl.createItem(item);
+            ((BrainStormMainActivity) getActivity()).popFragment();
+        }catch(Exception e){
+
+        }
     }
 
     private void keyboardHide() {

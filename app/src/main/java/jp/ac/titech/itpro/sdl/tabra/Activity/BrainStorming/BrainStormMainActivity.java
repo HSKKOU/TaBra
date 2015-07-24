@@ -3,7 +3,10 @@ package jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,9 +26,11 @@ public class BrainStormMainActivity extends Activity implements
 
     public static final String PARAM_THEME_ID = "THEME_ID";
     public static final String PARAM_USER_NAME = "USER_NAME";
+    public static final String PARAM_SERVER_THEME_ID = "SERVER_THEME_ID";
 
     private long mThemeId;
     private String mUserName = "";
+    private String mServerThemeId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +40,9 @@ public class BrainStormMainActivity extends Activity implements
         Intent intent = getIntent();
         mThemeId = intent.getLongExtra(PARAM_THEME_ID, -1);
         mUserName = intent.getStringExtra(PARAM_USER_NAME);
+        mServerThemeId = intent.getStringExtra(PARAM_SERVER_THEME_ID);
 
-        Log.d(TAG, "id: " + mThemeId + "userName: " + mUserName);
+        Log.d(TAG, "id: " + mThemeId + ", userName: " + mUserName + ", serverThemeId: " + mServerThemeId);
 
         replaceFragment(BrainStormMainActivityFragment.newInstance());
     }
@@ -56,6 +62,7 @@ public class BrainStormMainActivity extends Activity implements
 
     public long getmThemeId(){return this.mThemeId;}
     public String getmUserName(){return this.mUserName;}
+    public String getmServerThemeId() {return mServerThemeId;}
 
     @Override
     public void onFragmentInteraction(Uri uri) {
@@ -82,5 +89,15 @@ public class BrainStormMainActivity extends Activity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isConnectedInternet(Context context) {
+        ConnectivityManager cm =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if( info != null ){
+            return info.isConnected();
+        } else {
+            return false;
+        }
     }
 }

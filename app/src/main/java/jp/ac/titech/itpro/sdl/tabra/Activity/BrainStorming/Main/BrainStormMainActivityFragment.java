@@ -16,6 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.BrainStormMainActivity;
@@ -24,13 +28,17 @@ import jp.ac.titech.itpro.sdl.tabra.Activity.BrainStorming.DetailPostit.BrainSto
 import jp.ac.titech.itpro.sdl.tabra.R;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Controller.ItemDataController;
 import jp.ac.titech.itpro.sdl.tabra.SQLite.Model.Item;
+import jp.ac.titech.itpro.sdl.tabra.ServerConnector.ServerConnector;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class BrainStormMainActivityFragment extends Fragment {
+public class BrainStormMainActivityFragment extends Fragment implements ServerConnector.ServerConnectorDelegate {
 
     private static final String TAG = BrainStormMainActivityFragment.class.getSimpleName();
+
+    private static final String GET_ITEMS = "GET_ITEMS";
+    private static final String UPDATE_POS = "UPDATE_POS";
 
     private LinearLayout mCustomScrollView;
     private AbsoluteLayout mWhiteBoard;
@@ -106,8 +114,16 @@ public class BrainStormMainActivityFragment extends Fragment {
     }
 
     private void setPostits() {
-        BrainStormMainActivity activity = (BrainStormMainActivity)getActivity();
-        List<Item> itemList = mItemCtrl.getAllItems(activity.getmThemeId());
+        if(mActivity.isConnectedInternet(mActivity)){
+            String serverThemeId = mActivity.getmServerThemeId();
+            (new ServerConnector(this)).execute(GET_ITEMS, ServerConnector.ITEMS, "", ServerConnector.POST, "type=get_items_by_theme_id&theme_id=" + serverThemeId);
+        }else{
+            List<Item> itemList = mItemCtrl.getAllItems(mActivity.getmThemeId());
+            setItems(itemList);
+        }
+    }
+
+    private void setItems(List<Item> itemList) {
         for(Item item: itemList){
             View postitView = mPostitCtrl.createPostit(item);
             postitView.setOnTouchListener(new View.OnTouchListener() {
@@ -210,13 +226,7 @@ public class BrainStormMainActivityFragment extends Fragment {
 
         } else if(event.getAction() == MotionEvent.ACTION_UP) {
             String idStr = ((TextView)v.findViewById(R.id.postit_hidden_id)).getText().toString();
-            try{
-                long id = Long.parseLong(idStr);
-                mItemCtrl.updateItemPosition(id, (int)v.getX(), (int)v.getY());
-            }catch(Exception e){
-                Log.e(TAG, "Illegal id");
-            }
-
+            (new ServerConnector(this)).execute(UPDATE_POS, ServerConnector.ITEMS, "", ServerConnector.POST, "type=update_item_pos&id="+idStr+"&pos_x="+(int)v.getX()+"&pos_y="+(int)v.getY());
             return true;
         }
 
@@ -231,6 +241,66 @@ public class BrainStormMainActivityFragment extends Fragment {
         v.setX(x);
         v.setY(y);
     }
+
+    @Override
+    public void recieveResponse(String serverConnectorId, String responseStr) {
+        JSONObject json = null;
+        try{
+            json = new JSONObject(responseStr);
+            String result = json.getString("result");
+            if(!"success".equals(result)){
+                Log.d(TAG, "failed");
+                return;
+            }
+            if(GET_ITEMS.equals(serverConnectorId)){
+                finishGetItems(json);
+            } else if(UPDATE_POS.equals(serverConnectorId)) {
+                finishUpdatePos(json);
+            }
+        }catch(JSONException e){
+            Log.d(TAG, "json parse error");
+        }
+    }
+
+    private void finishGetItems(JSONObject json) throws JSONException {
+        mItemCtrl.deleteAllByThemeId(mActivity.getmServerThemeId());
+        JSONArray ja = json.getJSONArray("data");
+        for(int i=0; i<ja.length(); i++){
+            JSONObject jo = ja.getJSONObject(i);
+            mItemCtrl.createItem(jsonObj2Item(jo));
+        }
+
+        try{
+            long sid = Long.parseLong(mActivity.getmServerThemeId());
+            List<Item> itemList = mItemCtrl.getAllItems(sid);
+            setItems(itemList);
+        }catch(Exception e){
+
+        }
+    }
+
+    private void finishUpdatePos(JSONObject json) throws JSONException {
+        long id = json.getLong("id");
+        int posX = json.getInt("pos_x");
+        int posY = json.getInt("pos_y");
+        mItemCtrl.updateItemPosition(id, posX, posY);
+    }
+
+    private Item jsonObj2Item(JSONObject jo) throws JSONException {
+        Log.d(TAG, jo.toString());
+        Item ret = new Item(
+                jo.getLong("theme_id"),
+                jo.getLong("id"),
+                jo.getString("content"),
+                jo.getString("username"),
+                jo.getString("color"),
+                jo.getInt("pos_x"),
+                jo.getInt("pos_y")
+        );
+
+        return ret;
+    }
+
 }
 
 class Rect {
