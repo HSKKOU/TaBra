@@ -8,6 +8,7 @@ import android.os.Parcelable;
  */
 public class ThemeListItem implements Parcelable {
     private long id;
+    private String server_id;
     private String title;
 
     public ThemeListItem(long id, String title){
@@ -19,6 +20,9 @@ public class ThemeListItem implements Parcelable {
     public void setTitle(String title){this.title = title;}
 
     public long getId(){return id;}
+
+    public String getServer_id() {return server_id;}
+    public void setServer_id(String server_id) {this.server_id = server_id;}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
