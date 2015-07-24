@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -51,8 +52,11 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
     private UserDataController mUserDataCtrl;
     private ThemeDataController mThemeDataCtrl;
 
+    private Button mSyncButton;
+
     private String mUserId = "";
     private String mUserName = "";
+    private String mPasswd = "";
     private String mThemeIds = "";
 
     private static final String CREATE_USER = "CREATE_USER";
@@ -69,6 +73,14 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
         mThemeListView = (ListView)findViewById(R.id.theme_listview);
         mThemeListView.setOnItemClickListener(this);
         mThemeListView.setOnItemLongClickListener(this);
+
+        mSyncButton = (Button)findViewById(R.id.activity_theme_list_synchronize_button);
+        mSyncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login(mUserName, mPasswd);
+            }
+        });
 
         mUserDataCtrl = new UserDataController(this);
         mThemeDataCtrl = new ThemeDataController(this);
@@ -240,6 +252,7 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
         User u = new User(un, pw);
         mUserDataCtrl.createUser(u);
         mUserName = un;
+        mPasswd = pw;
         setupThemeList();
     }
 
@@ -261,6 +274,7 @@ public class ThemeListActivity extends Activity implements AdapterView.OnItemCli
     private void finishLogin(JSONObject json) throws JSONException {
         mUserId = json.getString("user_id");
         mUserName = json.getString("name");
+        mPasswd = json.getString("passwd");
         mThemeIds = json.getString("theme_ids");
         setupThemeList();
     }

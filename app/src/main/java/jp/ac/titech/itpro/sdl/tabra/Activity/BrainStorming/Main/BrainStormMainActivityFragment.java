@@ -40,9 +40,12 @@ public class BrainStormMainActivityFragment extends Fragment implements ServerCo
     private static final String GET_ITEMS = "GET_ITEMS";
     private static final String UPDATE_POS = "UPDATE_POS";
 
+    private static final int POSTIT_TAG = 1;
+
     private LinearLayout mCustomScrollView;
     private AbsoluteLayout mWhiteBoard;
     private Button mCreatePostitButton;
+    private Button mSyncButton;
 
     private PostitController mPostitCtrl;
 
@@ -73,6 +76,7 @@ public class BrainStormMainActivityFragment extends Fragment implements ServerCo
         mCustomScrollView = (LinearLayout)v.findViewById(R.id.brainstorm_main_custom_scrollview);
         mWhiteBoard = (AbsoluteLayout)v.findViewById(R.id.brainstorm_main_whiteboard);
         mCreatePostitButton = (Button)v.findViewById(R.id.brainstorm_main_create_postit_button);
+        mSyncButton = (Button)v.findViewById(R.id.brainstorm_main_syncronize_button);
 
         mPostitCtrl = new PostitController(getActivity());
 
@@ -80,6 +84,13 @@ public class BrainStormMainActivityFragment extends Fragment implements ServerCo
             @Override
             public void onClick(View v) {
                 pushCreateButton(v);
+            }
+        });
+
+        mSyncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPostits();
             }
         });
 
@@ -115,6 +126,7 @@ public class BrainStormMainActivityFragment extends Fragment implements ServerCo
 
     private void setPostits() {
         if(mActivity.isConnectedInternet(mActivity)){
+            mWhiteBoard.removeAllViews();
             String serverThemeId = mActivity.getmServerThemeId();
             (new ServerConnector(this)).execute(GET_ITEMS, ServerConnector.ITEMS, "", ServerConnector.POST, "type=get_items_by_theme_id&theme_id=" + serverThemeId);
         }else{
@@ -126,6 +138,7 @@ public class BrainStormMainActivityFragment extends Fragment implements ServerCo
     private void setItems(List<Item> itemList) {
         for(Item item: itemList){
             View postitView = mPostitCtrl.createPostit(item);
+            postitView.setTag(POSTIT_TAG);
             postitView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {return onPostitTouch(v, event);}
