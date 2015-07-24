@@ -38,7 +38,7 @@ public class PostitFactory {
         postit.setLayoutParams(layoutParams);
 
         TextView idText = (TextView)postit.findViewById(R.id.postit_hidden_id);
-        idText.setText(item.getId() + "");
+        idText.setText(item.getServer_id() + "");
 
         TextView contentText = (TextView)postit.findViewById(R.id.postit_text);
         contentText.setText(item.getContent() + "");
